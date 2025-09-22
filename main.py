@@ -1,12 +1,11 @@
 import sys
 import traceback
-from src.file_utils import read_file , write_result
+from src.file_utils import read_file, write_result
 from src.preprocess import preprocess
 from src.similarity import calculate_similarity
 
 
 def validate_arguments(args):
-    """验证命令行参数"""
     if len(args) != 4:
         raise ValueError("参数数量错误！正确用法: python main.py [原文文件] [抄袭版文件] [结果文件]")
     orig_path , copy_path , result_path = args[1] , args[2] , args[3]
@@ -17,7 +16,6 @@ def validate_arguments(args):
 
 
 def main():
-    """主函数：解析参数→读取文件→预处理→计算相似度→写入结果"""
     try:
         # 验证参数
         orig_path , copy_path , result_path = validate_arguments(sys.argv)
