@@ -31,21 +31,36 @@ def clean_text(text):
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned
 
+
+# preprocess.py（修改后）
+import time  # 导入时间模块
+import jieba
+from multiprocessing import cpu_count
+
+
+# 分词并过滤停用词，返回处理后的词列表
 def segment_text(text):
-    """中文分词并过滤停用词"""
     if not text:
         return []
-    # 使用jieba精确模式分词
-    words = jieba.lcut(text, cut_all=False)
-    # 过滤停用词和空字符串
-    filtered_words = [
-        word for word in words
-        if word.strip() and word not in STOPWORDS and len(word) > 1  # 过滤单字
-    ]
+    start_cut = time.time()  # 分词开始时间
+    words = jieba.lcut(text , cut_all = False)  # 精确模式分词
+    cut_time = time.time() - start_cut  # 分词耗时（秒）
+
+    start_filter = time.time()  # 过滤开始时间
+    filtered_words = [word for word in words if word.strip() and word not in STOPWORDS]  # 过滤逻辑
+    filter_time = time.time() - start_filter  # 过滤耗时（秒）
+
+    total_time = cut_time + filter_time
+    print(
+        f"【segment_text】总耗时: {total_time:.4f}s | 分词耗时: {cut_time:.4f}s ({cut_time / total_time * 100:.2f}%) "
+        f"| 过滤耗时: {filter_time:.4f}s ({filter_time / total_time * 100:.2f}%)")
+
     return filtered_words
 
+
+# 文本预处理主函数：清洗→分词→拼接为空格分隔的字符串
 def preprocess(text):
-    """文本预处理主函数：清洗→分词→拼接为空格分隔的字符串"""
+
     cleaned_text = clean_text(text)
     tokens = segment_text(cleaned_text)
     return ' '.join(tokens)  # 适合TF-IDF向量化的输入格式
